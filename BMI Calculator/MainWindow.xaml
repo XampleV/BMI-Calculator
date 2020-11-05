@@ -60,6 +60,7 @@
             </DataGrid.Columns>
         </DataGrid>-->
         <DataGrid Grid.Row="7" CanUserAddRows="False" Margin="3,5,1,1" Name="mainDataGrid" AlternatingRowBackground="Gray" Grid.ColumnSpan="8" Grid.RowSpan="2"/>
+        <Button Content="Exit" Grid.Column="6" HorizontalAlignment="Left"  Grid.Row="6" VerticalAlignment="Top" Width="76" Margin="0,67,0,0" Click="Button_Click_2"/>
     </Grid>
 
 </Window>

@@ -13,7 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
-
+using System.IO;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 namespace BMI_Calculator
 {
     /// <summary>
@@ -21,26 +23,74 @@ namespace BMI_Calculator
     /// </summary>
     public partial class MainWindow : Window
     {
+        public string FileLocation = @"C:\Users\alshoubaki_mohammad\AppData\data.json";
+        public static string json;
+        public static dynamic users;
         public ObservableCollection<Users> myList { get; set; }
         //List<Users> users = new List<Users>();
 
         public MainWindow()
         {
             InitializeComponent();
+            CheckFile();
             this.DataContext = this;
             myList = new ObservableCollection<Users>();
             mainDataGrid.ItemsSource = myList;
-
-
-            //testc();
+            LoadScores();
         }
-        public void testc()
+
+        public void CheckFile()
         {
-            this.DataContext = this;
+            if (!File.Exists(FileLocation))
+            {
+                string defaultJson = "{'database':[]}";
+                Root desHasToMadeFirst = JsonConvert.DeserializeObject<Root>(defaultJson);
+                string newJsonFileToBeWritten = JsonConvert.SerializeObject(desHasToMadeFirst, Formatting.Indented);
+                using (StreamWriter file = File.CreateText(FileLocation))
+                {
+                    file.Write(newJsonFileToBeWritten);
+                    file.Close();
+                    
+                }
+            }
+        }//
+        public void LoadScores()
+        {
+            using (StreamReader r = new StreamReader(FileLocation))
+            {
+                json = r.ReadToEnd();
+                r.Close();
 
-            myList.Add(new Users { lastName = "Doe", firstName = "Doe", phoneNum = " 123456789", height = "74", weight = "240", BMI = "25", status = "test" });
-            myList.Add(new Users { lastName = "Doeeee", firstName = "Doe", phoneNum = " 123456789", height = "74", weight = "240", BMI = "25", status = "test" });
+            }
+            users = JsonConvert.DeserializeObject<Root>(json);
+            foreach(var i in users.database)
+            {
+                myList.Insert(0, new Users
+                {
+                    lastName = i.lastName,
+                    firstName = i.firstName,
+                    phoneNum = i.phoneNum,
+                    height = i.height,
+                    weight = i.weight,
+                    BMI = i.BMI,
+                    status = i.status
+                });
+            }
         }
+        public void AddUser(string lastname, string firstname, string number, string height, string weight, string bmi, string status)
+        { 
+            string tempJson = "{'lastName':'" + lastname+"','firstName':'"+firstname+"','phoneNum':'"+number+"','height':'"+height+"','weight':'"+weight+"','bmi':'"+bmi+"','status':'"+status+"'}";
+            Database response = JsonConvert.DeserializeObject<Database>(tempJson);
+            users.database.Add(response);
+
+            string jsonToBeWritten = JsonConvert.SerializeObject(users, Formatting.Indented);
+            using (StreamWriter file = File.CreateText(FileLocation))
+            {
+                file.Write(jsonToBeWritten);
+                file.Close();
+            }
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             double userHeight = Convert.ToDouble(heightBox.Text);
@@ -80,6 +130,7 @@ namespace BMI_Calculator
             BMINum = Convert.ToInt32(BMINum);
             xMessage.Text = message;
             xBmiResults.Text = BMINum.ToString();
+            AddUser(lastNameBox.Text,  firstNameBox.Text, phoneNumBox.Text, heightBox.Text, weightBox.Text, BMINum.ToString(), title);
             myList.Insert(0, new Users
             {
                 lastName = lastNameBox.Text,
@@ -102,7 +153,13 @@ namespace BMI_Calculator
             xMessage.Text = "";
             xBmiResults.Text = "BMI Results";
         }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            Environment.Exit(0);
+        }
     }
+
     public class Users
     {
         public string lastName { get; set; }
@@ -113,7 +170,22 @@ namespace BMI_Calculator
         public string BMI { get; set; }
         public string status { get; set; }
     }
+    // TODO: I need to figure out a better way to do this json. 
+    public class Database
+    {
+        public string lastName { get; set; }
+        public string firstName { get; set; }
+        public string phoneNum { get; set; }
+        public string height { get; set; }
+        public string weight { get; set; }
+        public string BMI { get; set; }
+        public string status { get; set; }
+    }
 
+    public class Root
+    {
+        public List<Database> database { get; set; }
+    }
 }
 
 
