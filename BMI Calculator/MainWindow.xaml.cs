@@ -79,6 +79,7 @@ namespace BMI_Calculator
         }
         public void AddUser(string lastname, string firstname, string number, string height, string weight, string bmi, string status)
         { 
+            // how do i make it less ugly.
             string tempJson = "{'lastName':'" + lastname+"','firstName':'"+firstname+"','phoneNum':'"+number+"','height':'"+height+"','weight':'"+weight+"','bmi':'"+bmi+"','status':'"+status+"'}";
             Database response = JsonConvert.DeserializeObject<Database>(tempJson);
             users.database.Add(response);
