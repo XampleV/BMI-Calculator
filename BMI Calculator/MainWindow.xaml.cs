@@ -33,7 +33,6 @@ namespace BMI_Calculator
         {
             InitializeComponent();
             CheckFile();
-            this.DataContext = this;
             myList = new ObservableCollection<Users>();
             mainDataGrid.ItemsSource = myList;
             LoadScores();
@@ -53,7 +52,7 @@ namespace BMI_Calculator
                     
                 }
             }
-        }//
+        }
         public void LoadScores()
         {
             using (StreamReader r = new StreamReader(FileLocation))
